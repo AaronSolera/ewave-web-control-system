@@ -1,0 +1,12 @@
+{
+	"name": "WebControlSystem",
+	"version": "0.0.1",
+	"description": "Simple Angular app based in MEAN stack",
+	"main": "server.js",
+	"dependencies": {
+		"express": "~3.x",
+		"mongodb": "^3.3.3",
+		"mongodb-topology-manager": "^2.1.0",
+		"mongoose": "latest"
+	}
+}

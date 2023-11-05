@@ -1,0 +1,199 @@
+#include <SoftwareSerial.h>
+#include <ArduinoJson.h>
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+*   Measure pins:
+*   
+*   7  -> Encoder  
+*   A5 -> Pressure 1
+*   A4 -> Pressure 2
+*   A3 -> Current
+*   A2 -> Voltage
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+const byte rxPin = 2;
+const byte txPin = 3;
+const int pin[] = {7, A5, A4, A3, A2, A1};
+
+String ssid = "Wichi";
+String password = "wichi1234";
+
+String HOST = "pi-dsrb.localhost.run";
+String PORT = "80";
+
+String JSON_DATA, request, request_length, response;
+String p1, p2, p3, f, c, v;
+
+int timer = 0, frequency = 0;
+//StaticJsonDocument<200> JSON;
+
+SoftwareSerial esp8266 (rxPin, txPin);
+
+//Timer exception every second
+/*ISR(TIMER1_COMPA_vect){
+  timer++;
+  if(timer%20 == 0){
+     
+  }
+}*/
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pin[0], INPUT);
+  esp8266.begin(9600);
+  delay(1000);
+  reset();
+  connectWifi();
+  //initTimeInterrupt();
+}
+
+void loop() {
+  //GET("192.168.43.232", "3000", "/api/read/one/administrator/url?condition={}");
+  //frequency = getFrequency(pin[0]);
+  //measure[3] = String(frequency);
+  p1 = String(getPressure(pin[4]));
+  p2 = String(getPressure(pin[3]));
+  p3 = String(getPressure(pin[5]));
+  //JSON["Turbine frequency"] = 0;
+  //JSON["Current"] = getCurrent(100, pin[2]);
+  //JSON["Voltage"] = getVoltage(pin[1]);
+
+  /*JSON_DATA = "{\"Pressure 1\":" + String(getPressure(pin[4])) +
+              ",\"Pressure 2\":" + String(getPressure(pin[3])) +
+              ",\"Pressure 3\":" + String(getPressure(pin[5])) +
+              ",\"Turbine frequency\":0" +
+              ",\"Current\":" + String(getCurrent(100, pin[2])) + 
+              ",\"Voltage\":" + String(getVoltage(pin[1])) + 
+              "}";*/
+  JSON_DATA += "{\"Pressure 1\":"+ p1;
+  JSON_DATA += ",\"Pressure 2\":"+ p2;
+  JSON_DATA += ",\"Pressure 3\":"+ p3;
+  JSON_DATA += ",\"Turbine frequency\":0,\"Current\":0,\"Voltage\":0}";
+  //JSON_DATA = "{\"Email\":\"test\",\"Password\":\"1234\"}";
+         
+  //POST("/api/create/administrator/url?data={}", JSON_DATA);
+  //Serial.println(JSON_DATA);
+  //serializeJson(JSON, JSON_DATA);
+  POST("/api/create/measure/url?data={}", JSON_DATA);
+}
+
+void POST(String PATH, String JSON){
+  
+  request = "POST " + PATH + " HTTP/1.1\r\n" + 
+            "Content-Type: application/json; charset=utf-8\r\n" +
+            "Host: " + HOST +"\r\n" +
+            "Accept: */**\r\n" +
+            "Content-Length: " + String(JSON.length()) + "\r\n\r\n" +
+            JSON + "\r\n\r\n";
+
+  request_length = String(request.length());
+  response="";
+
+  esp8266.println("AT+CIPSTART=\"TCP\",\"" + HOST + "\","+PORT);
+  if(esp8266.find("OK")) Serial.println("TCP Connection Ready");
+
+  esp8266.println("AT+CIPSEND=" + request_length);
+
+  if(esp8266.find(">")) {
+    Serial.println("Sending Request...");
+    esp8266.print(request);
+  }
+  
+  if(esp8266.find("SEND OK")) Serial.println("Request Sent");
+  
+  while(!esp8266.available()) {};
+  
+  espRead();
+
+  esp8266.println("AT+CIPCLOSE");
+  
+  if(esp8266.find("OK")) Serial.println("TCP Connection Closed");
+
+  delay(10000);
+}
+
+void GET(String PATH){
+  request = "GET " + PATH + "\r\n" + "Host: " + HOST + "\r\n" + "Connection: keep-alive\r\n\r\n";
+  request_length = String(request.length());
+  response="";
+
+  esp8266.println("AT+CIPSTART=\"TCP\",\"" + HOST + "\","+PORT);
+  if(esp8266.find("OK")) Serial.println("TCP Connection Ready");
+  esp8266.println("AT+CIPSEND=" + request_length);
+  
+  if(esp8266.find(">")) {
+    Serial.println("Sending Request...");
+    esp8266.print(request);
+  }
+  
+  if(esp8266.find("SEND OK")) Serial.println("Request Sent");
+  while(!esp8266.available()) {};
+  
+  espRead();
+  
+  esp8266.println("AT+CIPCLOSE");
+  
+  if(esp8266.find("OK")) Serial.println("TCP Connection Closed");
+}
+
+void espRead() {
+  String c;
+  while(esp8266.available()) {
+    c = esp8266.readString();
+    Serial.println(c);
+    Serial.println();
+  }
+}
+
+void espClear() {
+  while(esp8266.available()) {
+    esp8266.read();
+  }
+}
+
+void reset() {
+  Serial.println("Resetting WiFi");
+  esp8266.println("AT+RST");
+  delay(1000);
+  if(esp8266.find("OK")) Serial.println("Reset!");
+}
+
+void setMode(String mode) {
+  Serial.println("Setting Mode = " + mode);
+  esp8266.println("AT+CWMODE=" + mode);
+  delay(1000);
+  espRead();
+}
+
+void connectWifi() {
+  espClear();
+  Serial.println("Connecting...");
+  String CMD = "AT+CWJAP=\"" +ssid+"\",\"" + password + "\"";
+  esp8266.println(CMD);
+  delay(5000);
+  while(!esp8266.available()) {};
+  if(esp8266.find("OK")) Serial.println("Connected");
+  else Serial.println("Couldn't connect to WiFi");
+}
+
+void initTimeInterrupt(){
+  //set timer1 interrupt at 1Hz
+  TCCR1A = 0;// set entire TCCR1A register to 0
+  TCCR1B = 0;// same for TCCR1B
+  TCNT1  = 0;//initialize counter value to 0
+  
+  // set compare match register for 1hz increments
+  OCR1A = 15624;// = (16*10^6) / (1024) - 1 (must be <65536)
+  
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  
+  // Set CS10 and CS12 bits for 1024 prescaler
+  TCCR1B |= (1 << CS12) | (1 << CS10);  
+  
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+  
+  //Enable global interrupts
+  sei();
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+
+<body>
+
+    <div class="container" style="padding-top: 30px">
+
+        <div class="row">
+            
+            <div class="col-6 text-center">
+
+                <div class="card">
+
+                    <div class="card-body">
+                        <zingchart id="vcChart" zc-json="vc_chart_json" zc-height="400" zc-width="500"></zingchart>
+                    </div>
+                    <div class="card-footer text-white bg-dark">
+                        <h5>Current and Voltage Chart</h5>
+                    </div>
+                    
+                </div>
+
+            </div>
+
+            <div class="col-6 text-center">
+
+                <div class="card">
+
+                    <div class="card-body">
+                        <zingchart id="ppChart" zc-json="pp_chart_json" zc-height="400" zc-width="500"></zingchart>
+                    </div>
+                    <div class="card-footer text-white bg-dark">
+                        <h5>Tank pressure 1 and 2 Chart</h5>
+                    </div>
+                    
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row" style="padding-top: 30px">
+
+            <div class="col-12 text-center">
+
+                <div class="card">
+
+                    <div class="card-body">
+                        <h1><b>{{measures["Turbine frequency"]}} Hz</b></h1>
+                    </div>
+                    <div class="card-footer text-white bg-dark">
+                        <h5>Turbine frequency</h5>
+                    </div>
+                    
+                </div>
+    
+            </div>
+
+        </div>
+
+    </div>
+    <!--
+    <div class="container" style="padding-top: 30px">
+
+        <div class="row">
+            
+            <div class="col-12 text-center" style="padding-left: 350px; padding-right: 350px; padding-top: 70px;">
+
+                <h3 class="card-subtitle mb-2 text-muted"><b>Welcome back {{logintype.view}}</b></h3>
+                <p class="card-text" style="padding-bottom: 20px;">Manage your Internet of Things based PLCs</p>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="user_input"><b>User ID</b></span>
+                    </div>
+                    <input type="text" class="form-control" ng-model="email" placeholder="Example: xuser123" aria-describedby="user_input">
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="code_input"><b>Access Code</b></span>
+                    </div>
+                    <input type="password" class="form-control" ng-model="password" placeholder="Example: 1X34APC" aria-describedby="code_input">
+                </div>
+
+                </br>
+            
+            <button ng-click="checkLogin()" type="button" class="btn btn-secondary btn-circle btn-circle-lg m-1"><i class="fas fa-sign-in-alt"></i></button>
+                
+            </div>
+
+            <div class="fixed-bottom" style="padding-bottom: 20px; padding-right: 20px;">
+
+                <button ng-click="setLoginType('administrador')" type="button" class="btn btn-secondary btn-circle btn-circle-lg m-1 float-right"><i class="fas fa-user-tie"></i></button>
+                <button ng-click="setLoginType('employee')" type="button" class="btn btn-secondary btn-circle btn-circle-lg m-1 float-right"><i class="fas fa-user"></i></button>
+
+            </div>
+
+        </div>
+
+    </div>
+    -->
+
+</body>
+
+</html>
