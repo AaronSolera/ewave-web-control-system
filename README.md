@@ -40,3 +40,5 @@ In the future, we intended to expand the project to allow the capture of input s
 - [DNS - No-IP](https://www.noip.com/)
 - [PM2 and Dataplicity](https://medium.com/@andrew.nease.code/set-up-a-self-booting-node-js-eb56ebd05549)
 - [Express tutorial (MongoDB)](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website)
+
+[Project's original location](https://drive.google.com/drive/folders/1j3us-76fIlk-vq_jP_7lp5EAnqb_eEYj?usp=sharing)
